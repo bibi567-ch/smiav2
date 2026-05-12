@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
+      <a routerLink="/dashboard" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <span class="text-2xl">🔊</span>
+      <div>
+        <h1 class="font-bold text-gray-900">Control Acústico</h1>
+        <p class="text-xs text-gray-500">Monitoreo de Ruido — Normativa REGAM</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-8">
+    
+    @if (resultado()) {
+      <div class="mb-6 p-5 rounded-xl border-2 {{ resultado().excedencia ? 'bg-red-50 border-red-300 text-red-800' : 'bg-emerald-50 border-emerald-300 text-emerald-800' }}">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">{{ resultado().excedencia ? '⚠️' : '✅' }}</span>
+          <div>
+            <p class="font-bold text-lg">
+              {{ resultado().excedencia ? '¡ALERTA! Límite excedido' : 'Nivel dentro de la norma' }}
+            </p>
+            <p class="text-sm mt-1">Se registró un nivel de <strong>{{ resultado().nivel }} dB</strong>.</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="font-semibold text-gray-800 mb-6">Nueva Medición (Sonómetro)</h2>
+
+      <form (ngSubmit)="onGuardar()">
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Punto de Control *</label>
+            <select [(ngModel)]="form.punto" name="punto" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500">
+              <option value="">Selecciona una ubicación</option>
+              @for (p of puntos(); track p.id) { <option [value]="p.id">{{ p.nombre }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Fecha y Hora *</label>
+            <input type="datetime-local" [(ngModel)]="form.fecha_hora" name="fecha_hora" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"/>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Zona de Medición *</label>
+            <select [(ngModel)]="form.zona" name="zona" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500">
+              @for (z of zonas; track z.id) { <option [value]="z.id">{{ z.nombre }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Nivel Registrado (dB) *</label>
+            <input type="number" [(ngModel)]="form.nivel_db" name="nivel_db" min="0" step="0.1" placeholder="Ej: 68.5" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 font-mono"/>
+          </div>
+        </div>
+
+        <div class="mb-6 flex items-center gap-3 bg-purple-50 p-4 rounded-lg border border-purple-100">
+          <input type="checkbox" [(ngModel)]="form.es_nocturno" name="es_nocturno" id="nocturno" class="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 cursor-pointer"/>
+          <label for="nocturno" class="text-sm font-medium text-purple-900 cursor-pointer">
+            🌙 Marcar si la medición fue en Horario Nocturno (aplica límites más estrictos)
+          </label>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100">
+          <button type="submit" [disabled]="guardando()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2.5 rounded-lg transition">
+            {{ guardando() ? 'Evaluando norma...' : 'Guardar Medición' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

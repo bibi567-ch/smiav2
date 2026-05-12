@@ -1,0 +1,343 @@
+<div class="min-h-screen bg-gray-50 font-sans">
+
+  <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center shadow">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-gray-900 text-sm leading-tight">SMIA</p>
+            <p class="text-xs text-gray-500 leading-tight">Sistema Municipal de Información Ambiental</p>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a href="#calidad-aire" class="text-gray-600 hover:text-emerald-600 transition">Calidad del Aire</a>
+          <a href="#alertas" class="text-gray-600 hover:text-emerald-600 transition">Alertas</a>
+          <a href="#denuncias" class="text-gray-600 hover:text-emerald-600 transition">Reportar problema</a>
+        </nav>
+
+        <button (click)="abrirLogin()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span class="hidden sm:inline">Acceso Funcionarios</span>
+          <span class="sm:hidden">Acceso</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <section class="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <div class="max-w-2xl">
+        <span class="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full mb-4">
+          <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+          Datos actualizados en tiempo real
+        </span>
+        <h1 class="text-3xl lg:text-4xl font-bold leading-tight mb-4">
+          Información Ambiental del<br/>
+          Municipio de La Paz
+        </h1>
+        <p class="text-emerald-100 text-base lg:text-lg mb-8">
+          Consulta la calidad del aire, el estado de los ríos y las alertas ambientales de tu ciudad. Sin necesidad de registro.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#calidad-aire" class="bg-white text-emerald-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-emerald-50 transition shadow">
+            Ver calidad del aire
+          </a>
+          <button (click)="abrirDenuncia()" class="border border-white/60 text-white font-medium px-5 py-2.5 rounded-lg hover:bg-white/10 transition">
+            Reportar un problema
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div>
+          <p class="text-2xl font-bold text-emerald-600">{{ estadisticas.estaciones_activas }}</p>
+          <p class="text-xs text-gray-500 mt-1">Estaciones activas</p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-emerald-600">{{ estadisticas.rios_monitoreados }}</p>
+          <p class="text-xs text-gray-500 mt-1">Ríos monitoreados</p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-emerald-600">{{ estadisticas.denuncias_mes }}</p>
+          <p class="text-xs text-gray-500 mt-1">Denuncias este mes</p>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-emerald-600">{{ estadisticas.denuncias_resueltas }}</p>
+          <p class="text-xs text-gray-500 mt-1">Casos resueltos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="calidad-aire" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">Calidad del Aire por Zona</h2>
+        <p class="text-sm text-gray-500 mt-1">Índice de Calidad del Aire (ICA) — Metodología EPA</p>
+      </div>
+      <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">Actualizado hoy</span>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      @for (zona of zonas; track zona.zona) {
+        <div class="border-l-4 rounded-xl p-5 shadow-sm {{ getBgColor(zona.color) }}">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-sm font-semibold text-gray-700">{{ zona.zona }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ zona.actualizacion }}</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full text-white {{ getBadgeColor(zona.color) }}">
+              <span class="w-1.5 h-1.5 bg-white/80 rounded-full"></span>
+              {{ zona.nivel }}
+            </span>
+          </div>
+          <p class="text-4xl font-bold {{ getTextColor(zona.color) }}">{{ zona.ica }}</p>
+          <p class="text-xs text-gray-500 mt-1">ICA — {{ zona.contaminante }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4">Escala del Índice de Calidad del Aire</h3>
+      <div class="flex flex-wrap gap-3">
+        @for (nivel of [
+          {rango:'0–50',    etiqueta:'Bueno',            color:'bg-emerald-500'},
+          {rango:'51–100',  etiqueta:'Moderado',         color:'bg-amber-400'},
+          {rango:'101–150', etiqueta:'Grupos sensibles', color:'bg-orange-500'},
+          {rango:'151–200', etiqueta:'Dañino',           color:'bg-red-500'},
+          {rango:'201+',    etiqueta:'Muy dañino',       color:'bg-purple-600'}
+        ]; track nivel.rango) {
+          <div class="flex items-center gap-2 text-xs text-gray-600">
+            <div class="w-8 h-3 rounded-full {{ nivel.color }}"></div>
+            <span><strong>{{ nivel.rango }}</strong> {{ nivel.etiqueta }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="alertas" class="bg-amber-50 border-y border-amber-200 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-2 mb-5">
+        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <h2 class="text-base font-bold text-amber-800">Alertas Ambientales Activas</h2>
+        <span class="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{{ alertas.length }}</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        @for (alerta of alertas; track alerta.zona) {
+          <div class="bg-white rounded-xl p-5 shadow-sm border border-amber-200">
+            <div class="flex items-start gap-3">
+              <span class="text-2xl">{{ alerta.icono }}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <p class="text-sm font-semibold text-gray-800">{{ alerta.tipo }}</p>
+                  <span class="text-xs text-gray-400">{{ alerta.fecha }}</span>
+                </div>
+                <p class="text-xs font-medium text-amber-700 mb-1">📍 {{ alerta.zona }}</p>
+                <p class="text-xs text-gray-600">{{ alerta.descripcion }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="denuncias" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="bg-emerald-600 px-8 py-6 text-white">
+        <h2 class="text-xl font-bold">Reportar un Problema Ambiental</h2>
+        <p class="text-emerald-100 text-sm mt-1">
+          Tu denuncia es atendida por técnicos de la Secretaría Municipal de Gestión Ambiental. Recibirás un número de seguimiento para consultar el estado.
+        </p>
+      </div>
+      <div class="p-8">
+        <button (click)="abrirDenuncia()" class="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition shadow">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nueva denuncia ambiental
+        </button>
+        <p class="text-xs text-gray-400 mt-3">No necesitas crear una cuenta. Guarda tu número de seguimiento para rastrear el estado.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-gray-400 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white text-sm font-semibold">SMIA</p>
+            <p class="text-xs">Gobierno Autónomo Municipal de La Paz</p>
+          </div>
+        </div>
+        <div class="text-xs text-center md:text-right">
+          <p>Secretaría Municipal de Gestión Ambiental</p>
+          <p class="mt-1">Datos proporcionados por la Red MoniCA — La Paz, Bolivia</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+@if (mostrarLogin()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="cerrarLogin()">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8" (click)="$event.stopPropagation()">
+      <button (click)="cerrarLogin()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-xl mb-3">
+          <svg class="w-6 h-6 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900">Acceso al Sistema</h2>
+        <p class="text-sm text-gray-500 mt-1">Solo para funcionarios autorizados del GAMLP</p>
+      </div>
+
+      <form (ngSubmit)="onLogin()">
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Correo institucional</label>
+          <input type="email" [(ngModel)]="loginEmail" name="loginEmail" placeholder="usuario@gamlp.bo" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" autocomplete="email"/>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Contraseña</label>
+          <div class="relative">
+            <input [type]="mostrarPassword() ? 'text' : 'password'" [(ngModel)]="loginPassword" name="loginPassword" placeholder="••••••••" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-10" autocomplete="current-password"/>
+            <button type="button" (click)="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                @if (mostrarPassword()) {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                }
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        @if (loginError()) {
+          <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            {{ loginError() }}
+          </div>
+        }
+
+        <button type="submit" [disabled]="loginCargando()" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 text-sm">
+          @if (loginCargando()) {
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            Verificando...
+          } @else {
+            Ingresar
+          }
+        </button>
+      </form>
+      <p class="text-center text-xs text-gray-400 mt-5">¿Olvidaste tu contraseña? Contacta al administrador del sistema.</p>
+    </div>
+  </div>
+}
+
+@if (mostrarFormDenuncia()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4" (click)="cerrarDenuncia()">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <button (click)="cerrarDenuncia()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      @if (denunciaEnviada()) {
+        <div class="text-center py-4">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
+            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Denuncia registrada</h3>
+          <p class="text-gray-500 text-sm mb-4">Tu denuncia fue recibida correctamente. Guarda tu número de seguimiento:</p>
+          <div class="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4 mb-6">
+            <p class="text-2xl font-bold text-emerald-700 font-mono">{{ numeroDenuncia() }}</p>
+            <p class="text-xs text-emerald-600 mt-1">Número de seguimiento</p>
+          </div>
+          <p class="text-xs text-gray-400 mb-6">Un técnico de la SMGA revisará tu reporte en un plazo de 48 horas hábiles.</p>
+          <button (click)="cerrarDenuncia()" class="bg-emerald-600 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-emerald-700 transition">
+            Cerrar
+          </button>
+        </div>
+      } @else {
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-gray-900">Reportar problema ambiental</h2>
+          <p class="text-sm text-gray-500 mt-1">No necesitas crear una cuenta.</p>
+        </div>
+
+        <form (ngSubmit)="onEnviarDenuncia()">
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Tipo de problema *</label>
+            <select [(ngModel)]="denuncia.tipo" name="tipo" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+              <option value="">Selecciona una categoría</option>
+              @for (tipo of tiposDenuncia; track tipo) {
+                <option [value]="tipo">{{ tipo }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Ubicación del problema *</label>
+            <input type="text" [(ngModel)]="denuncia.ubicacion" name="ubicacion" placeholder="Ej: Calle Mercado esq. Bueno, Sopocachi" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Descripción del problema *</label>
+            <textarea [(ngModel)]="denuncia.descripcion" name="descripcion" rows="4" placeholder="Describe lo que observaste con el mayor detalle posible..." class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Correo para notificaciones (opcional)</label>
+            <input type="email" [(ngModel)]="denuncia.email_contacto" name="email_contacto" placeholder="tu@correo.com" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+            <p class="text-xs text-gray-400 mt-1">Te notificaremos cuando el estado de tu reporte cambie.</p>
+          </div>
+
+          <button type="submit" [disabled]="!denuncia.tipo || !denuncia.descripcion || !denuncia.ubicacion" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold py-3 rounded-lg transition text-sm">
+            Enviar denuncia
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+}

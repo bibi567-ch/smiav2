@@ -1,0 +1,103 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
+      <a routerLink="/dashboard" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </a>
+      <span class="text-2xl">🚗</span>
+      <div>
+        <h1 class="font-bold text-gray-900">Emisiones Vehiculares</h1>
+        <p class="text-xs text-gray-500">Operativos en vía pública — Roseta Ambiental</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-8">
+    @if (exito()) {
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm flex items-center gap-2">
+        ✅ Inspección vehicular registrada correctamente. Siguiente vehículo en fila.
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <div class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-sm">{{ errorMsg() }}</div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="font-semibold text-gray-800 mb-6">Datos de Inspección</h2>
+
+      <form (ngSubmit)="onGuardar()">
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Punto de Control *</label>
+            <select [(ngModel)]="form.punto" name="punto" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+              <option value="">Seleccione ubicación</option>
+              @for (p of puntos(); track p.id) { <option [value]="p.id">{{ p.nombre }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Fecha y Hora *</label>
+            <input type="datetime-local" [(ngModel)]="form.fecha_hora" name="fecha_hora" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"/>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Nro. de Placa *</label>
+            <input type="text" [(ngModel)]="form.placa" name="placa" placeholder="Ej: 1234ABC" class="w-full px-3 py-2 border border-gray-300 rounded-md uppercase font-bold text-center"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Tipo Vehículo</label>
+            <select [(ngModel)]="form.tipo_vehiculo" name="tipo_vehiculo" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+              @for (t of tiposVehiculo; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Año Fab. (Opcional)</label>
+            <input type="number" [(ngModel)]="form.anio_vehiculo" name="anio_vehiculo" placeholder="Ej: 2015" class="w-full px-3 py-2 border border-gray-300 rounded-md"/>
+          </div>
+        </div>
+
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Gases Contaminantes Analizados</p>
+        <div class="grid sm:grid-cols-4 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">CO (%)</label>
+            <input type="number" [(ngModel)]="form.co_pct" name="co" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md font-mono"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">HC (ppm)</label>
+            <input type="number" [(ngModel)]="form.hc_ppm" name="hc" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md font-mono"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">NOx (ppm)</label>
+            <input type="number" [(ngModel)]="form.nox_ppm" name="nox" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md font-mono"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Opacidad (%)</label>
+            <input type="number" [(ngModel)]="form.opacidad_pct" name="opacidad" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-md font-mono"/>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">Dictamen de la Inspección *</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-emerald-50 transition" [class.border-emerald-500]="form.cumple_norma">
+              <input type="radio" [value]="true" [(ngModel)]="form.cumple_norma" name="norma" class="w-4 h-4 text-emerald-600">
+              <span class="font-bold text-emerald-800">✅ APROBADO (Cumple Norma)</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-red-50 transition" [class.border-red-500]="!form.cumple_norma">
+              <input type="radio" [value]="false" [(ngModel)]="form.cumple_norma" name="norma" class="w-4 h-4 text-red-600">
+              <span class="font-bold text-red-800">❌ RECHAZADO (Excede Límites)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100">
+          <button type="submit" [disabled]="guardando()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg w-full sm:w-auto">
+            {{ guardando() ? 'Guardando...' : 'Emitir Registro Vehicular' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

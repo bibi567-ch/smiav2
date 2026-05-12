@@ -1,0 +1,140 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center
+                justify-between">
+      <div class="flex items-center gap-3">
+        <a routerLink="/dashboard"
+           class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <span class="text-2xl">💨</span>
+        <div>
+          <h1 class="font-bold text-gray-900">
+            Calidad del Aire — Red MoniCA
+          </h1>
+          <p class="text-xs text-gray-500">
+            Mapa de estaciones · ICA en tiempo real
+          </p>
+        </div>
+      </div>
+      <a routerLink="/monitoreo/aire/carga"
+         class="bg-emerald-600 hover:bg-emerald-700 text-white
+                text-sm font-semibold px-4 py-2 rounded-lg
+                transition flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Registrar datos
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-6">
+
+    <!-- Estadísticas rápidas -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl p-4 shadow-sm border
+                  border-gray-100 text-center">
+        <p class="text-2xl font-bold text-gray-800">
+          {{ totalPuntos() }}
+        </p>
+        <p class="text-xs text-gray-500 mt-1">Total estaciones</p>
+      </div>
+      <div class="bg-emerald-50 rounded-xl p-4 shadow-sm border
+                  border-emerald-100 text-center">
+        <p class="text-2xl font-bold text-emerald-700">
+          {{ puntoBueno() }}
+        </p>
+        <p class="text-xs text-emerald-600 mt-1">Nivel Bueno</p>
+      </div>
+      <div class="bg-amber-50 rounded-xl p-4 shadow-sm border
+                  border-amber-100 text-center">
+        <p class="text-2xl font-bold text-amber-700">
+          {{ puntoModerado() }}
+        </p>
+        <p class="text-xs text-amber-600 mt-1">Nivel Moderado</p>
+      </div>
+      <div class="bg-red-50 rounded-xl p-4 shadow-sm border
+                  border-red-100 text-center">
+        <p class="text-2xl font-bold text-red-700">
+          {{ puntoCritico() }}
+        </p>
+        <p class="text-xs text-red-600 mt-1">Nivel Crítico</p>
+      </div>
+    </div>
+
+    <!-- Mapa Leaflet -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100
+                overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex
+                  items-center justify-between">
+        <h2 class="font-semibold text-gray-800">
+          Mapa de Estaciones
+        </h2>
+        <button (click)="cargarPuntos()"
+                class="text-xs text-emerald-600 hover:text-emerald-800
+                       flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582
+                     9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0
+                     01-15.357-2m15.357 2H15"/>
+          </svg>
+          Actualizar
+        </button>
+      </div>
+
+      @if (cargando()) {
+        <div class="flex items-center justify-center h-64">
+          <div class="text-center">
+            <svg class="animate-spin w-8 h-8 text-emerald-500 mx-auto"
+                 fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10"
+                      stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <p class="text-sm text-gray-500 mt-2">Cargando mapa...</p>
+          </div>
+        </div>
+      } @else {
+        <app-mapa-leaflet altura="500px"/>
+      }
+    </div>
+
+    <!-- Leyenda ICA -->
+    <div class="mt-4 bg-white rounded-xl p-4 shadow-sm
+                border border-gray-100">
+      <p class="text-xs font-semibold text-gray-600 mb-3">
+        Leyenda — Índice de Calidad del Aire (EPA)
+      </p>
+      <div class="flex flex-wrap gap-4">
+        @for (nivel of [
+          {color:'#00e400', label:'0–50 Bueno'},
+          {color:'#ffff00', label:'51–100 Moderado'},
+          {color:'#ff7e00', label:'101–150 Grupos sensibles'},
+          {color:'#ff0000', label:'151–200 Dañino'},
+          {color:'#8f3f97', label:'201+ Muy dañino'},
+        ]; track nivel.label) {
+          <div class="flex items-center gap-2 text-xs text-gray-600">
+            <div class="w-4 h-4 rounded-full border border-gray-200"
+                 [style.background]="nivel.color">
+            </div>
+            {{ nivel.label }}
+          </div>
+        }
+      </div>
+    </div>
+
+  </main>
+</div>

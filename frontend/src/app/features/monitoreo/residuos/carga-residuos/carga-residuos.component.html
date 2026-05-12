@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-gray-50">
+
+  <header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center gap-3">
+      <a routerLink="/dashboard" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <span class="text-2xl">🗑️</span>
+      <div>
+        <h1 class="font-bold text-gray-900">Carga de Datos — Residuos Sólidos</h1>
+        <p class="text-xs text-gray-500">Sincronización con SIGIR (MMAyA)</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-8">
+
+    @if (exito()) {
+      <div class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Pesaje registrado correctamente y en cola para SIGIR.
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        {{ errorMsg() }}
+      </div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="font-semibold text-gray-800 mb-6">Registro de ingreso (Báscula)</h2>
+
+      <form (ngSubmit)="onGuardar()">
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Instalación *</label>
+            <select [(ngModel)]="form.punto_residuos" name="punto_residuos"
+                    class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500">
+              <option value="">Selecciona el relleno/punto</option>
+              @for (p of puntos(); track p.id) {
+                <option [value]="p.id">{{ p.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Fecha *</label>
+            <input type="date" [(ngModel)]="form.fecha" name="fecha"
+                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500"/>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Tipo de Residuo *</label>
+            <select [(ngModel)]="form.tipo_residuo" name="tipo_residuo"
+                    class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500">
+              @for (t of tipos; track t.id) {
+                <option [value]="t.id">{{ t.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Peso Neto (Toneladas) *</label>
+            <input type="number" [(ngModel)]="form.peso_toneladas" name="peso_toneladas" min="0" step="0.001" placeholder="Ej: 12.500"
+                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 font-mono"/>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1.5">Operador en turno</label>
+          <input type="text" [(ngModel)]="form.operador" name="operador"
+                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500"/>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100">
+          <button type="submit" [disabled]="guardando()"
+                  class="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white font-semibold px-6 py-2.5 rounded-lg transition flex items-center gap-2">
+            @if (guardando()) {
+              Procesando...
+            } @else {
+              Guardar Pesaje
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
