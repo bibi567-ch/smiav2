@@ -1,8 +1,19 @@
 # frontend/Dockerfile.dev
-FROM node:20-alpine
+FROM node:18-alpine
+
 WORKDIR /app
+
+# Instalamos el CLI de Angular globalmente
+RUN npm install -g @angular/cli@18
+
+# Copiamos archivos de dependencias
 COPY package*.json ./
-RUN npm install -g @angular/cli@17
 RUN npm install
+
 COPY . .
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000"]
+
+# Exponemos el puerto de Angular
+EXPOSE 4200
+
+# Comando para levantar el servidor de desarrollo con acceso externo
+CMD ["ng", "serve", "--host", "0.0.0.0"]

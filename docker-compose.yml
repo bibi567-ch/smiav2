@@ -1,80 +1,41 @@
-
+version: '3.8'
 
 services:
-  # ── Base de datos espacial ──────────────────────────────────────────
+  # Base de Datos con extensiones espaciales (SMIA)
   db:
     image: postgis/postgis:15-3.3
     container_name: smia_db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      POSTGRES_DB: smia_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-  # ── Broker para reintentos SIGIR y notificaciones ───────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: smia_redis
-    ports:
-      - "6379:6379"
-
-  # ── API Django ──────────────────────────────────────────────────────
+  # Backend Django
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     container_name: smia_backend
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - SECRET_KEY=${DJANGO_SECRET_KEY}
-      - REDIS_URL=${REDIS_URL}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-
-  # ── Worker Celery (reintentos SIGIR + emails) ───────────────────────
-  worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: smia_worker
-    command: celery -A smia_core worker --loglevel=info --queues=sigir,notifications
-    volumes:
-      - ./backend:/app
+      - db
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-    depends_on:
-      - backend
-      - redis
+      DATABASE_URL: postgres://admin:adminpassword@db:5432/smia_db
 
-  # ── Frontend Angular (dev server) ──────────────────────────────────
+  # Frontend Angular
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
     container_name: smia_frontend
-    command: ng serve --host 0.0.0.0 --port 4200 --proxy-config proxy.conf.json
     volumes:
       - ./frontend:/app
-      - /app/node_modules          # Evita sobreescribir node_modules del contenedor
+      - /app/node_modules
     ports:
       - "4200:4200"
     depends_on:
